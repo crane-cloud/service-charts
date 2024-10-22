@@ -512,6 +512,7 @@ server:
     ## Prometheus server data Persistent Volume size
     ##
     size: 8Gi
+    # size: 50Gi
 
     ## Prometheus server data Persistent Volume Storage Class
     ## If defined, storageClassName: <storageClass>
@@ -731,6 +732,7 @@ server:
     servicePort: 80
     sessionAffinity: None
     type: NodePort
+    nodePort: 31845
 
     ## Enable gRPC port on service to allow auto discovery with thanos-querier
     gRPC:
@@ -778,18 +780,18 @@ serverFiles:
   ## Alerts configuration
   ## Ref: https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/
   alerting_rules.yml:
-  # groups:
-  #   - name: Instances
-  #     rules:
-  #       - alert: InstanceDown
-  #         expr: up == 0
-  #         for: 5m
-  #         labels:
-  #           severity: page
-  #         annotations:
-  #           description: '{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes.'
-  #           summary: 'Instance {{ $labels.instance }} down'
-  ## DEPRECATED DEFAULT VALUE, unless explicitly naming your files, please use alerting_rules.yml
+    # groups:
+    #   - name: Instances
+    #     rules:
+    #       - alert: InstanceDown
+    #         expr: up == 0
+    #         for: 5m
+    #         labels:
+    #           severity: page
+    #         annotations:
+    #           description: '{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes.'
+    #           summary: 'Instance {{ $labels.instance }} down'
+    ## DEPRECATED DEFAULT VALUE, unless explicitly naming your files, please use alerting_rules.yml
     groups:
       - name: prom_alerts
         rules:
@@ -805,7 +807,7 @@ serverFiles:
 
           # Memory Usage Alert
           - alert: HighMemoryUsage
-            expr: sum(container_memory_working_set_bytes) by (pod) > 700 * 1024 * 1024  # 700 MB
+            expr: sum(container_memory_working_set_bytes) by (pod) > 700 * 1024 * 1024 # 700 MB
             for: 2m
             labels:
               severity: warning
@@ -815,7 +817,7 @@ serverFiles:
 
           # Network Receive Alert
           - alert: HighNetworkReceive
-            expr: sum(rate(container_network_receive_bytes_total[1m])) by (pod) > 10 * 1024 * 1024  # 10 MB/s
+            expr: sum(rate(container_network_receive_bytes_total[1m])) by (pod) > 10 * 1024 * 1024 # 10 MB/s
             for: 2m
             labels:
               severity: warning
@@ -825,7 +827,7 @@ serverFiles:
 
           # Network Transmit Alert
           - alert: HighNetworkTransmit
-            expr: sum(rate(container_network_transmit_bytes_total[1m])) by (pod) > 10 * 1024 * 1024  # 10 MB/s
+            expr: sum(rate(container_network_transmit_bytes_total[1m])) by (pod) > 10 * 1024 * 1024 # 10 MB/s
             for: 2m
             labels:
               severity: warning
@@ -1365,23 +1367,27 @@ alertmanager:
   persistence:
     size: 2Gi
 
+  service:
+    type: NodePort
+    nodePort: 31678
+
   podSecurityContext:
     runAsUser: 65534
     runAsNonRoot: true
     runAsGroup: 65534
     fsGroup: 65534
-    
+
   config:
     global:
       resolve_timeout: 5m
     route:
-      group_by: ['prom_alerts']
+      group_by: ["prom_alerts"]
       group_wait: 30s
       group_interval: 1h
       repeat_interval: 1h
-      receiver: 'slack-receiver'
+      receiver: "slack-receiver"
     receivers:
-      - name: 'slack-receiver'
+      - name: "slack-receiver"
         slack_configs:
           - send_resolved: true
             api_url: 'https://hooks.slack.com/services/xxx/xxxx/xxxx'
