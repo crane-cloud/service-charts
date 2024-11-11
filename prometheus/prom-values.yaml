@@ -2,6 +2,7 @@
 # Default values for prometheus.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+# helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 
 rbac:
   create: true
@@ -367,11 +368,11 @@ server:
   ingress:
     ## If true, Prometheus server Ingress will be created
     ##
-    enabled: false
+    enabled: true
 
     # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
     # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
-    # ingressClassName: nginx
+    ingressClassName: traefik
 
     ## Prometheus server Ingress annotations
     ##
@@ -389,8 +390,8 @@ server:
     ## Prometheus server Ingress hostnames with optional path
     ## Must be provided if Ingress is enabled
     ##
-    hosts: []
-    #   - prometheus.domain.com
+    hosts:
+      - prometheus.renu-01.cranecloud.io
     #   - domain.com/prometheus
 
     path: /
@@ -1390,8 +1391,8 @@ alertmanager:
       - name: "slack-receiver"
         slack_configs:
           - send_resolved: true
-            api_url: 'https://hooks.slack.com/services/xxx/xxxx/xxxx'
-            channel: '#prom-alerts'
+            api_url: "https://hooks.slack.com/services/xxx/xxxx/xxxx"
+            channel: "#prom-alerts"
             text: "{{ range .Alerts }}*Alert:* {{ .Labels.prom_alerts}}\n*Description:* {{ .Annotations.description }}\n*Severity:* {{ .Labels.severity }}\n{{ end }}"
 
 ## kube-state-metrics sub-chart configurable values
