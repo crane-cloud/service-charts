@@ -1,8 +1,8 @@
 # # Seldon Core Operator
 # helm repo add seldon-core-operator https://storage.googleapis.com/seldon-charts
 # Install with
-# helm install seldon-core seldon-core-operator\
-# --repo https://storage.googleapis.com/seldon-charts -f seldon-values.yml -n mlops
+# helm install seldon-core seldon-core-operator \
+# --repo https://storage.googleapis.com/seldon-charts -f seldon-values.yml -n seldon
 
 # Below are the default values when installing Seldon Core
 
@@ -20,7 +20,7 @@ ambassador:
 # When activating Istio, respecive virtual services will be created
 # You must make sure you create the seldon-gateway as well
 istio:
-  enabled: false
+  enabled: true
   gateway: istio-system/seldon-gateway
   tlsMode: ""
 # If you have KEDA installed you can use it for autoscaling
