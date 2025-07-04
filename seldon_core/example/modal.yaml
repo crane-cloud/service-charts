@@ -1,0 +1,34 @@
+apiVersion: machinelearning.seldon.io/v1
+kind: SeldonDeployment
+metadata:
+  name: iris-model
+  namespace: mlops-test
+spec:
+  name: iris
+  predictors:
+    - graph:
+        implementation: SKLEARN_SERVER
+        modelUri: gs://seldon-models/v1.19.0-dev/sklearn/iris
+        name: classifier
+      name: default
+      replicas: 1
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: iris-model-ingress
+  namespace: mlops-test
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: iris-model.ahumain.cranecloud.io
+      http:
+        paths:
+          - pathType: ImplementationSpecific
+            path: /
+            backend:
+              service:
+                name: iris-model-default
+                port:
+                  number: 8000
